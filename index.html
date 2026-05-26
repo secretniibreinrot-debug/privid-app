@@ -3,249 +3,177 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ПРИВІД</title>
+    <title>ПРИВІД ПЛАТФОРМА</title>
     <style>
-        body { background: #0d1117; color: #58a6ff; font-family: monospace; padding: 20px; text-align: center; }
-        .box { border: 2px dashed #238636; padding: 20px; border-radius: 10px; background: #161b22; max-width: 450px; margin: 0 auto; box-shadow: 0 0 15px rgba(35,134,54,0.3); }
-        h1 { color: #238636; text-shadow: 0 0 10px rgba(35,134,54,0.5); font-size: 20px; margin-bottom: 5px; }
-        .role-badge { display: inline-block; padding: 3px 8px; border-radius: 3px; font-size: 12px; font-weight: bold; margin-bottom: 15px; }
-        .badge-client { background: #1f6feb; color: white; }
-        .badge-ghost { background: #8957e5; color: white; }
-        .badge-admin { background: #238636; color: white; }
-        .btn { background: #238636; color: white; border: none; padding: 10px 20px; font-size: 14px; border-radius: 5px; cursor: pointer; font-family: monospace; font-weight: bold; margin: 5px; }
+        body { background: #0d1117; color: #c9d1d9; font-family: monospace; padding: 10px; text-align: center; margin: 0; }
+        .box { border: 2px solid #30363d; padding: 15px; border-radius: 10px; background: #161b22; max-width: 480px; margin: 10px auto; min-height: 85vh; display: flex; flex-direction: column; justify-content: space-between; }
+        h1 { color: #58a6ff; text-shadow: 0 0 5px rgba(88,166,255,0.3); font-size: 22px; margin: 5px 0; }
+        .nav-menu { display: flex; justify-content: space-around; background: #21262d; padding: 10px; border-radius: 5px; margin-bottom: 15px; border: 1px solid #30363d; }
+        .nav-item { color: #8b949e; cursor: pointer; font-weight: bold; font-size: 12px; text-transform: uppercase; }
+        .nav-item.active { color: #58a6ff; border-bottom: 2px solid #58a6ff; }
+        .btn { background: #238636; color: white; border: none; padding: 10px 15px; font-size: 13px; border-radius: 5px; cursor: pointer; font-family: monospace; font-weight: bold; margin: 5px; width: 85%; }
         .btn:hover { background: #2ea043; }
         .btn-danger { background: #da3637; }
         .btn-danger:hover { background: #f85149; }
-        .btn-secondary { background: #30363d; color: #c9d1d9; border: 1px solid #8b949e; }
-        .btn-secondary:hover { background: #21262d; }
-        input, select { background: #0d1117; color: #58a6ff; border: 1px solid #30363d; padding: 10px; border-radius: 5px; width: 80%; margin: 10px 0; font-family: monospace; text-align: center; }
-        .hidden { display: none; }
-        .card { border: 1px solid #30363d; padding: 10px; margin: 10px 0; border-radius: 5px; background: #21262d; text-align: left; }
-        .status-active { color: #2ea043; font-weight: bold; }
-        .code-display { font-size: 18px; color: #79c0ff; font-weight: bold; background: #0d1117; padding: 5px; border-radius: 5px; border: 1px solid #30363d; display: inline-block; margin: 10px 0; letter-spacing: 2px; }
+        .btn-nav { background: #30363d; color: #c9d1d9; width: auto; padding: 5px 10px; font-size: 11px; border: 1px solid #8b949e; }
+        input, select { background: #0d1117; color: #58a6ff; border: 1px solid #30363d; padding: 10px; border-radius: 5px; width: 80%; margin: 8px 0; font-family: monospace; text-align: center; }
+        .hidden { display: none !important; }
+        .screen { flex-grow: 1; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; }
+        .card { border: 1px solid #30363d; padding: 10px; margin: 8px 0; border-radius: 5px; background: #21262d; text-align: left; width: 85%; }
+        .game-area { width: 90%; height: 150px; background: #0d1117; border: 1px solid #30363d; position: relative; margin-top: 10px; overflow: hidden; border-radius: 5px; }
+        #clicker-circle { width: 70px; height: 70px; background: #da3637; border-radius: 50%; position: absolute; top: 40px; left: 110px; cursor: pointer; box-shadow: 0 0 10px #da3637; }
     </style>
 </head>
 <body>
 
     <div class="box">
-        <h1>🕵️‍♂️ ПРИВІД</h1>
-        
-        <div id="role-client-badge" class="role-badge badge-client">ТЕРМІНАЛ ЗАМОВНИКА</div>
-        <div id="role-ghost-badge" class="role-badge badge-ghost hidden">ТЕРМІНАЛ ПРИВИДА (ВИКОНАВЕЦЬ)</div>
-        <div id="role-admin-badge" class="role-badge badge-admin hidden">ГОЛОВНИЙ СЕРВЕР (АДМІНІСТРАТОР)</div>
-
-        <p style="margin: 5px 0;">Ваш баланс: <b id="user-balance">10500</b> 🪙</p>
-        <button class="btn" style="padding: 5px 10px; font-size: 11px;" onclick="farmCoins()">🎰 Фарм монет (+рандом)</button>
-        
-        <hr style="border-color: #30363d;">
-
-        <div id="order-creation-block">
-            <h3>📦 ОФОРМИТИ ЗАМОВЛЕННЯ</h3>
-            <select id="order-type">
-                <option value="🕵️‍♂️ Збір інформації">🕵️‍♂️ Збір інформації (100 монет)</option>
-                <option value="⚡ Швидка доставка">⚡ Швидка доставка (250 монет)</option>
-                <option value="🔒 Захист даних">🔒 Захист даних (500 монет)</option>
-            </select>
-            <input type="text" id="order-comment" placeholder="Деталі або коментар до замовлення...">
+        <div id="login-screen" class="screen">
+            <h1>🕵️‍♂️ ВХІД В ПРИВІД</h1>
+            <p>Система вимагає авторизації захищеним паролем:</p>
+            <input type="password" id="login-password" placeholder="Введіть ваш пароль...">
             <br>
-            <button class="btn" onclick="createOrder()">ВІДПРАВИТИ ЗАМОВЛЕННЯ</button>
+            <button class="btn" onclick="login()">УВІЙТИ В АКАУНТ</button>
         </div>
 
-        <div id="ghost-block" class="hidden">
-            <hr style="border-color: #30363d;">
-            <h3>👁️ СЕКРЕТНІ ЗАМОВЛЕННЯ ДЛЯ ПРИВИДІВ</h3>
-            <div id="ghost-orders-list">
-                <p style="color: #8b949e;">Доступних замовлень від клієнтів немає...</p>
+        <div id="main-interface" class="screen hidden">
+            <div style="width: 100%;">
+                <h1>ПРИВІД</h1>
+                <p style="font-size: 12px; color: #8b949e; margin: 2px 0;">Акаунт: <span id="lbl-nick" style="color:#79c0ff"></span> | Баланс: <span id="lbl-bal" style="color:#2ea043"></span> ₴</p>
+                
+                <div class="nav-menu">
+                    <div class="nav-item active" id="tab-home" onclick="switchTab('home')">Головна</div>
+                    <div class="nav-item" id="tab-orders" onclick="switchTab('orders')">Замовлення</div>
+                    <div class="nav-item" id="tab-games" onclick="switchTab('games')">Ігри</div>
+                    <div class="nav-item" id="tab-settings" onclick="switchTab('settings')">Налаштування</div>
+                </div>
             </div>
-        </div>
 
-        <div id="admin-block" class="hidden">
-            <hr style="border-color: #30363d;">
-            <h3>🔑 ГЕНЕРАТОР КОДІВ ДЛЯ ПРИВИДІВ</h3>
-            <button class="btn btn-secondary" onclick="generateGhostCode()">⚡ Створити код для Привида</button>
-            <br>
-            <div id="generated-code-block" class="hidden">
-                <span class="code-display" id="display-code">PRV-0000</span>
-                <p style="color: #8b949e; font-size: 11px;">(Одноразовий код. Клієнт введе його внизу і стане Привидом)</p>
+            <div id="view-home" class="screen-view" style="width: 100%;">
+                <h3>📊 ТОП ЗАМОВЛЕНЬ ПО МЕРЕЖІ</h3>
+                <div class="card">
+                    <ol style="margin: 5px; padding-left: 20px; font-size: 13px;">
+                        <li>👑 Admin — 48 замовлень</li>
+                        <li>👻 Ghost-713 — 32 замовлення</li>
+                        <li>📱 User_Stealth — 19 замовлень</li>
+                    </ol>
+                </div>
+                
+                <div id="client-request-ghost" class="card">
+                    <h4>🔒 Бажаєте стати Привидом?</h4>
+                    <p style="font-size: 11px; color: #8b949e;">Надішліть запит адміну. Після перевірки ви отримаєте доступ до виконання секретних місій.</p>
+                    <button class="btn btn-nav" onclick="sendGhostRequest()">Надіслати запит адміну</button>
+                </div>
             </div>
-            
-            <h4>Активні коди в базі (<span id="codes-count">0</span>):</h4>
-            <div id="active-codes-list" style="color: #79c0ff; font-size: 12px; margin-bottom: 10px;">Немає</div>
 
-            <h3>📥 ВСІ ЗАМОВЛЕННЯ В СИСТЕМІ:</h3>
-            <div id="admin-orders-list"></div>
-            <br>
-            <button class="btn btn-danger" onclick="clearAllOrders()">Очистити всю історію</button>
-        </div>
+            <div id="view-orders" class="screen-view hidden" style="width: 100%;">
+                <h3>📦 СТВОРЕННЯ ЗАМОВЛЕННЯ</h3>
+                <p style="font-size:11px; color:#8b949e;">(Ціни встановлюються індивідуально адмінастратором)</p>
+                <select id="order-select">
+                    <option value="Сбор данных">Сбор данных (Базова ціна: 500 ₴)</option>
+                    <option value="Пранк-доставка">Пранк-доставка (Базова ціна: 1500 ₴)</option>
+                    <option value="Спец-Місія">Спец-Місія (Базова ціна: 5000 ₴)</option>
+                </select>
+                <input type="text" id="order-desc" placeholder="Опишіть деталі та умову завдання...">
+                <button class="btn" onclick="makeOrder()">ВІДПРАВИТИ ЗАМОВЛЕННЯ</button>
+            </div>
 
-        <div id="activation-block">
-            <hr style="border-color: #30363d; margin-top: 25px;">
-            <p style="font-size: 12px; color: #8b949e;">Маєте секретний код доступу?</p>
-            <input type="text" id="secret-code" placeholder="Введіть код сюди..." style="width: 60%; padding: 5px;">
-            <br>
-            <button class="btn btn-secondary" style="padding: 5px 15px; font-size: 12px;" onclick="checkCode()">Активувати</button>
+            <div id="view-games" class="screen-view hidden" style="width: 100%;">
+                <h3>🎯 ЗБИТИ ЧАС (МІНІ-ГРА)</h3>
+                <p>Встигни клікнути по цілі, що тікає! Рахунок: <b id="game-score">0</b></p>
+                <div class="game-area">
+                    <div id="clicker-circle" onclick="moveTarget()"></div>
+                </div>
+            </div>
+
+            <div id="view-settings" class="screen-view hidden" style="width: 100%;">
+                <h3>⚙️ НАЛАШТУВАННЯ АКАУНТУ</h3>
+                <div class="card">
+                    <p><b>Ваш нікнейм:</b> <span id="set-nick"></span></p>
+                    <p><b>Поточний статус:</b> <span id="set-role" style="color:#8957e5; font-weight:bold;"></span></p>
+                </div>
+                <br>
+                <button class="btn btn-danger" onclick="logout()">🚨 ВИЙТИ З АКАУНТУ (WIPE SESSION)</button>
+            </div>
         </div>
     </div>
 
     <script>
-        const ADMIN_KEY = "ADMIN999";
+        // Парсим параметры из ссылки Телеграма
+        const urlParams = new URLSearchParams(window.location.search);
+        const userTelegramId = urlParams.get('id') || "test_user";
+        const userRole = urlParams.get('role') || "client";
+        const userNick = urlParams.get('nick') || "Анонім";
+        const userBal = urlParams.get('bal') || "0";
 
-        // Завантаження бази даних
-        let userBalance = parseInt(localStorage.getItem('prv_balance')) || 10500;
-        let orders = JSON.parse(localStorage.getItem('global_orders')) || [];
-        let ghostCodes = JSON.parse(localStorage.getItem('ghost_codes')) || [];
-        let userRole = localStorage.getItem('user_role') || 'client'; // за замовчуванням всі - клієнти
+        // Заполняем данные на экране
+        document.getElementById('lbl-nick').innerText = userNick;
+        document.getElementById('set-nick').innerText = userNick;
+        document.getElementById('lbl-bal').innerText = userBal;
+        document.getElementById('set-role').innerText = userRole.toUpperCase();
 
-        document.getElementById('user-balance').innerText = userBalance;
-
-        // Налаштування інтерфейсу під роль при старті
-        applyRoleInterface();
-
-        function applyRoleInterface() {
-            // Приховуємо все за замовчуванням
-            document.getElementById('role-client-badge').classList.add('hidden');
-            document.getElementById('role-ghost-badge').classList.add('hidden');
-            document.getElementById('role-admin-badge').classList.add('hidden');
-            document.getElementById('ghost-block').classList.add('hidden');
-            document.getElementById('admin-block').classList.add('hidden');
-            document.getElementById('activation-block').classList.remove('hidden');
-
-            if (userRole === 'admin') {
-                document.getElementById('role-admin-badge').classList.remove('hidden');
-                document.getElementById('admin-block').classList.remove('hidden');
-                document.getElementById('activation-block').classList.add('hidden');
-                renderAdminOrders();
-                renderActiveCodes();
-            } else if (userRole === 'ghost') {
-                document.getElementById('role-ghost-badge').classList.remove('hidden');
-                document.getElementById('ghost-block').classList.remove('hidden');
-                renderGhostOrders();
-            } else {
-                document.getElementById('role-client-badge').classList.remove('hidden');
-            }
+        if(userRole === 'ghost' || userRole === 'admin') {
+            document.getElementById('client-request-ghost').classList.add('hidden');
         }
 
-        // Перевірка введенного коду
-        function checkCode() {
-            let inputCode = document.getElementById('secret-code').value.trim();
+        // Логика авторизации
+        function login() {
+            let pass = document.getElementById('login-password').value.trim();
+            if(!pass) return alert("Введіть пароль!");
             
-            if (inputCode === ADMIN_KEY) {
-                userRole = 'admin';
-                localStorage.setItem('user_role', 'admin');
-                applyRoleInterface();
-                alert("👑 Вітаємо, Босс! Головний сервер активовано.");
-                document.getElementById('secret-code').value = "";
-                return;
-            }
-
-            if (ghostCodes.includes(inputCode)) {
-                // Видаляємо одноразовий код із бази
-                ghostCodes = ghostCodes.filter(c => c !== inputCode);
-                localStorage.setItem('ghost_codes', JSON.stringify(ghostCodes));
-                
-                userRole = 'ghost';
-                localStorage.setItem('user_role', 'ghost');
-                applyRoleInterface();
-                alert("👻 Код активовано! Ви стали ПРИВИДОМ. Вам доступні секретні замовлення!");
-                document.getElementById('secret-code').value = "";
-            } else {
-                alert("❌ Код не знайдено, або він вже був використаний іншим Привидом.");
-            }
+            // Запоминаем в сессии, что пароль введен
+            sessionStorage.setItem('is_logged', 'true');
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('main-interface').classList.remove('hidden');
         }
 
-        // АДМІН: Створення одноразового коду для Привида
-        function generateGhostCode() {
-            let randomNum = Math.floor(1000 + Math.random() * 9000);
-            let newCode = `GHOST-${randomNum}`;
-            ghostCodes.push(newCode);
-            localStorage.setItem('ghost_codes', JSON.stringify(ghostCodes));
-            document.getElementById('display-code').innerText = newCode;
-            document.getElementById('generated-code-block').classList.remove('hidden');
-            renderActiveCodes();
+        // Проверка при открытии: если вылетал - требуем пароль
+        if(sessionStorage.getItem('is_logged') === 'true') {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('main-interface').classList.remove('hidden');
         }
 
-        function renderActiveCodes() {
-            document.getElementById('codes-count').innerText = ghostCodes.length;
-            let listDiv = document.getElementById('active-codes-list');
-            listDiv.innerText = ghostCodes.length === 0 ? "Немає" : ghostCodes.join(', ');
+        function logout() {
+            sessionStorage.removeItem('is_logged');
+            alert("🔒 Сесію закрито. Дані акаунту скинуто!");
+            window.location.reload(); // выкидывает на окно ввода пароля
         }
 
-        // Фарм монет
-        function farmCoins() {
-            let win = Math.floor(Math.random() * 150) + 20;
-            userBalance += win;
-            localStorage.setItem('prv_balance', userBalance);
-            document.getElementById('user-balance').innerText = userBalance;
+        // Переключение вкладок
+        function switchTab(tabName) {
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.screen-view').forEach(el => el.classList.add('hidden'));
+            
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+            document.getElementById(`view-${tabName}`).classList.remove('hidden');
         }
 
-        // КЛІЄНТ / ПРИВИД: Створення замовлення
-        function createOrder() {
-            let type = document.getElementById('order-type').value;
-            let comment = document.getElementById('order-comment').value.trim();
-            if(!comment) return alert("Опишіть деталі замовлення!");
-
-            let newOrder = {
-                id: Date.now(),
-                type: type,
-                comment: comment,
-                author: userRole === 'ghost' ? '👻 Привид' : '📱 Замовник',
-                status: '⚡ Очікує перевірки'
-            };
-
-            orders.push(newOrder);
-            localStorage.setItem('global_orders', JSON.stringify(orders));
-            document.getElementById('order-comment').value = "";
-            alert("🎯 Замовлення надіслано в систему ПРИВІД!");
-            if(userRole === 'ghost') renderGhostOrders();
+        // Создание заказа
+        function makeOrder() {
+            let type = document.getElementById('order-select').value;
+            let desc = document.getElementById('order-desc').value.trim();
+            if(!desc) return alert("Опишіть деталі пранку або місії!");
+            
+            alert(`🎯 Замовлення "${type}" надіслано адміну на перевірку ціни та балансу!`);
+            document.getElementById('order-desc').value = "";
         }
 
-        // ПРИВИД: Перегляд замовлень
-        function renderGhostOrders() {
-            let listDiv = document.getElementById('ghost-orders-list');
-            listDiv.innerHTML = "";
-            if(orders.length === 0) {
-                listDiv.innerHTML = '<p style="color: #8b949e;">Доступних замовлень немає...</p>';
-                return;
-            }
-            orders.forEach(order => {
-                let div = document.createElement('div');
-                div.className = 'card';
-                div.innerHTML = `<b>Тип:</b> ${order.type}<br><b>Деталі:</b> ${order.comment}<br><b>Статус:</b> <span style="color:#79c0ff">${order.status}</span>`;
-                listDiv.appendChild(div);
-            });
+        function sendGhostRequest() {
+            alert("📨 Запит на статус 'Привид' успішно надіслано в ЛС адміну бота!");
         }
 
-        // АДМІН: Відображення замовлень з кнопками
-        function renderAdminOrders() {
-            let listDiv = document.getElementById('admin-orders-list');
-            listDiv.innerHTML = "";
-            if(orders.length === 0) {
-                listDiv.innerHTML = '<p style="color: #8b949e;">Замовлень немає</p>';
-                return;
-            }
-            orders.forEach(order => {
-                let div = document.createElement('div');
-                div.className = 'card';
-                div.innerHTML = `
-                    <b>Від кого:</b> ${order.author}<br>
-                    <b>Тип:</b> ${order.type}<br>
-                    <b>Деталі:</b> ${order.comment}<br>
-                    <b>Статус:</b> <b>${order.status}</b><br><br>
-                    <button class="btn" style="padding:5px 10px; font-size:11px;" onclick="updateStatus(${order.id}, '✅ ПРИЙНЯТО')">Прийняти</button>
-                    <button class="btn btn-danger" style="padding:5px 10px; font-size:11px;" onclick="updateStatus(${order.id}, '❌ ВІДХИЛЕНО')">Відхилити</button>
-                `;
-                listDiv.appendChild(div);
-            });
-        }
-
-        function updateStatus(id, newStatus) {
-            orders = orders.map(o => { if(o.id === id) o.status = newStatus; return o; });
-            localStorage.setItem('global_orders', JSON.stringify(orders));
-            renderAdminOrders();
-        }
-
-        function clearAllOrders() {
-            if(confirm("Очистити все?")) { orders = []; localStorage.setItem('global_orders', JSON.stringify(orders)); renderAdminOrders(); }
+        // Логика мини-игры
+        let score = 0;
+        function moveTarget() {
+            score++;
+            document.getElementById('game-score').innerText = score;
+            let circle = document.getElementById('clicker-circle');
+            
+            // Рандомно перемещаем кружок внутри блока
+            let randomX = Math.floor(Math.random() * 180);
+            let randomY = Math.floor(Math.random() * 80);
+            
+            circle.style.left = randomX + 'px';
+            circle.style.top = randomY + 'px';
         }
     </script>
 </body>
