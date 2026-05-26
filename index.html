@@ -1,26 +1,227 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="uk">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Сеть ПРИВІД</title>
+    <title>ПРИВІД</title>
     <style>
-        body { background: #0d1117; color: #58a6ff; font-family: monospace; text-align: center; padding: 40px; }
-        .box { border: 2px dashed #238636; padding: 30px; border-radius: 10px; display: inline-block; background: #161b22; box-shadow: 0 0 15px rgba(35,134,54,0.5); }
-        h1 { color: #238636; text-shadow: 0 0 10px #238636; }
-        .btn { background: #238636; color: white; border: none; padding: 12px 25px; font-size: 16px; border-radius: 5px; cursor: pointer; font-family: monospace; font-weight: bold; }
+        body { background: #0d1117; color: #58a6ff; font-family: monospace; padding: 20px; text-align: center; }
+        .box { border: 2px dashed #238636; padding: 20px; border-radius: 10px; background: #161b22; max-width: 450px; margin: 0 auto; box-shadow: 0 0 15px rgba(35,134,54,0.3); }
+        h1 { color: #238636; text-shadow: 0 0 10px rgba(35,134,54,0.5); font-size: 20px; }
+        .btn { background: #238636; color: white; border: none; padding: 10px 20px; font-size: 14px; border-radius: 5px; cursor: pointer; font-family: monospace; font-weight: bold; margin: 5px; }
         .btn:hover { background: #2ea043; }
+        .btn-danger { background: #da3637; }
+        .btn-danger:hover { background: #f85149; }
+        .btn-secondary { background: #30363d; color: #c9d1d9; border: 1px solid #8b949e; }
+        .btn-secondary:hover { background: #21262d; }
+        input, select { background: #0d1117; color: #58a6ff; border: 1px solid #30363d; padding: 10px; border-radius: 5px; width: 80%; margin: 10px 0; font-family: monospace; text-align: center; }
+        .hidden { display: none; }
+        .card { border: 1px solid #30363d; padding: 10px; margin: 10px 0; border-radius: 5px; background: #21262d; text-align: left; }
+        .status-active { color: #2ea043; font-weight: bold; }
+        .code-display { font-size: 18px; color: #79c0ff; font-weight: bold; background: #0d1117; padding: 5px; border-radius: 5px; border: 1px solid #30363d; display: inline-block; margin: 10px 0; letter-spacing: 2px; }
     </style>
 </head>
 <body>
+
     <div class="box">
-        <h1>🕵️‍♂️ СЕТЬ «ПРИВІД» 2.0</h1>
-        <p>Добро пожаловать в личный терминал управления, Шеф.</p>
-        <hr style="border-color: #21262d;">
-        <p>Статус: <span style="color:#2ea043; font-weight: bold;">ГЛАВНЫЙ СЕРВЕР АКТИВЕН</span></p>
-        <p>Баланс сети: <b>10,500 ₴</b></p>
-        <br>
-        <button class="btn" onclick="alert('Запрос отправлен! Агенты на радаре получили сигнал.')">🎯 РАДАР КОНТРАКТОВ</button>
+        <div id="auth-screen">
+            <h1>🕵️‍♂️ ПРИВІД</h1>
+            <p>Для активації терміналу введіть секретний одноразовий код доступу:</p>
+            <input type="text" id="secret-code" placeholder="Код доступу (наприклад, PRV-1234)...">
+            <br>
+            <button class="btn" onclick="checkCode()">ПІДКЛЮЧИТИСЯ</button>
+            <p style="color: #8b949e; font-size: 11px; margin-top: 20px;">*Якщо у вас немає коду, зверніться до адміністратора в ЛС.</p>
+        </div>
+
+        <div id="client-screen" class="hidden">
+            <h1>📱 ТЕРМІНАЛ КОРИСТУВАЧА</h1>
+            <p>Статус з'єднання: <span class="status-active">ЗАШИФРОВАНО (ОДНОРАЗОВИЙ ВХІД)</span></p>
+            <p>Ваш баланс: <b id="client-balance">0</b> 🪙 (рандомні монетки)</p>
+            <button class="btn" onclick="farmCoins()">🎰 Випробувати вдачу (Фарм монет)</button>
+            
+            <hr style="border-color: #30363d;">
+            
+            <h3>📦 ОФОРМИТИ НОВЕ ЗАМОВЛЕННЯ</h3>
+            <select id="order-type">
+                <option value="🕵️‍♂️ Збір інформації">🕵️‍♂️ Збір інформації (100 монет)</option>
+                <option value="⚡ Швидка доставка">⚡ Швидка доставка (250 монет)</option>
+                <option value="🔒 Захист даних">🔒 Захист даних (500 монет)</option>
+            </select>
+            <input type="text" id="order-comment" placeholder="Деталі або коментар до замовлення...">
+            <br>
+            <button class="btn" onclick="createOrder()">ВІДПРАВИТИ ЗАМОВЛЕННЯ</button>
+        </div>
+
+        <div id="admin-screen" class="hidden">
+            <h1>👑 ПАНЕЛЬ УПРАВЛІННЯ (АДМІН)</h1>
+            <p>Статус: <span class="status-active">ГОЛОВНИЙ СЕРВЕР ПРИВІД</span></p>
+            <p>Баланс системи: <span style="color:#2ea043; font-weight:bold;">9,999,999 ₴</span></p>
+            
+            <hr style="border-color: #30363d;">
+            
+            <h3>🔑 ГЕНЕРАТОР ОДНОРАЗОВИХ КОДІВ</h3>
+            <p>Згенеруйте код та віддайте його одному виконавцю:</p>
+            <button class="btn btn-secondary" onclick="generateOneTimeCode()">⚡ Згенерувати новий код</button>
+            <br>
+            <div id="generated-code-block" class="hidden">
+                <span class="code-display" id="display-code">PRV-0000</span>
+                <p style="color: #8b949e; font-size: 11px;">(Скопіюйте цей код та відправте в ЛС. Він згорить після першого входу!)</p>
+            </div>
+            
+            <h4>Активні коди в базі (<span id="codes-count">0</span>):</h4>
+            <div id="active-codes-list" style="color: #79c0ff; font-size: 12px; margin-bottom: 10px;">Немає активних кодів</div>
+
+            <hr style="border-color: #30363d;">
+            
+            <h3>📥 НАДХОДЖЕННЯ ЗАМОВЛЕНЬ:</h3>
+            <div id="admin-orders-list">
+                <p style="color: #8b949e;">Нових замовлень поки немає...</p>
+            </div>
+            <br>
+            <button class="btn btn-danger" onclick="clearAllOrders()">Очистити всю історію замовлень</button>
+        </div>
     </div>
+
+    <script>
+        // Головний пароль адміна (завжди працює)
+        const ADMIN_KEY = "ADMIN999";
+
+        // Завантаження бази даних
+        let clientBalance = parseInt(localStorage.getItem('client_balance')) || 0;
+        let orders = JSON.parse(localStorage.getItem('global_orders')) || [];
+        let oneTimeCodes = JSON.parse(localStorage.getItem('one_time_codes')) || [];
+
+        document.getElementById('client-balance').innerText = clientBalance;
+
+        // Перевірка коду при вході
+        function checkCode() {
+            let inputCode = document.getElementById('secret-code').value.trim();
+            
+            // 1. Перевірка на адміна
+            if (inputCode === ADMIN_KEY) {
+                document.getElementById('auth-screen').classList.add('hidden');
+                document.getElementById('admin-screen').classList.remove('hidden');
+                renderAdminOrders();
+                renderActiveCodes();
+                return;
+            }
+            
+            // 2. Перевірка на одноразовий клієнтський код
+            if (oneTimeCodes.includes(inputCode)) {
+                // Видаляємо код із бази, бо він ОДНОРАЗОВИЙ
+                oneTimeCodes = oneTimeCodes.filter(c => c !== inputCode);
+                localStorage.setItem('one_time_codes', JSON.stringify(oneTimeCodes));
+                
+                // Пропускаємо в термінал
+                document.getElementById('auth-screen').classList.add('hidden');
+                document.getElementById('client-screen').classList.remove('hidden');
+                alert("✅ Доступ дозволено! Цей код успішно активовано та анульовано в базі.");
+            } else {
+                alert("❌ ПОМИЛКА: Невірний, застарілий або вже використаний код доступу.");
+            }
+        }
+
+        // АДМІН: Генерація нового одноразового коду
+        function generateOneTimeCode() {
+            let randomNum = Math.floor(1000 + Math.random() * 9000); // 4-значне число
+            let newCode = `PRV-${randomNum}`;
+            
+            oneTimeCodes.push(newCode);
+            localStorage.setItem('one_time_codes', JSON.stringify(oneTimeCodes));
+            
+            document.getElementById('display-code').innerText = newCode;
+            document.getElementById('generated-code-block').classList.remove('hidden');
+            
+            renderActiveCodes();
+        }
+
+        // АДМІН: Показ списку робочих кодів
+        function renderActiveCodes() {
+            document.getElementById('codes-count').innerText = oneTimeCodes.length;
+            let listDiv = document.getElementById('active-codes-list');
+            if(oneTimeCodes.length === 0) {
+                listDiv.innerText = "Немає активних кодів";
+            } else {
+                listDiv.innerText = oneTimeCodes.join(', ');
+            }
+        }
+
+        // КЛІЄНТ: Фарм монеток
+        function farmCoins() {
+            let randomWin = Math.floor(Math.random() * 50) + 10;
+            clientBalance += randomWin;
+            localStorage.setItem('client_balance', clientBalance);
+            document.getElementById('client-balance').innerText = clientBalance;
+            alert(`🎰 Ви виграли ${randomWin} рандомних монеток!`);
+        }
+
+        // КЛІЄНТ: Створення замовлення
+        function createOrder() {
+            let type = document.getElementById('order-type').value;
+            let comment = document.getElementById('order-comment').value.trim();
+            
+            if(!comment) {
+                alert("Будь ласка, напишіть деталі замовлення!");
+                return;
+            }
+
+            let newOrder = {
+                id: Date.now(),
+                type: type,
+                comment: comment,
+                status: '⚡ Очікує на перевірку'
+            };
+
+            orders.push(newOrder);
+            localStorage.setItem('global_orders', JSON.stringify(orders));
+            document.getElementById('order-comment').value = "";
+            alert("🎯 Замовлення успішно відправлено адміністратору!");
+        }
+
+        // АДМІН: Відображення замовлень
+        function renderAdminOrders() {
+            let listDiv = document.getElementById('admin-orders-list');
+            listDiv.innerHTML = "";
+
+            if(orders.length === 0) {
+                listDiv.innerHTML = '<p style="color: #8b949e;">Нових замовлень поки немає...</p>';
+                return;
+            }
+
+            orders.forEach(order => {
+                let orderDiv = document.createElement('div');
+                orderDiv.className = 'card';
+                orderDiv.innerHTML = `
+                    <b>Тип:</b> ${order.type}<br>
+                    <b>Деталі:</b> ${order.comment}<br>
+                    <b>Статус:</b> <span>${order.status}</span><br><br>
+                    <button class="btn" style="padding:5px 10px; font-size:11px;" onclick="updateStatus(${order.id}, '✅ ПРИЙНЯТО')">Приняти</button>
+                    <button class="btn btn-danger" style="padding:5px 10px; font-size:11px;" onclick="updateStatus(${order.id}, '❌ ВІДХИЛЕНО')">Відхилити</button>
+                `;
+                listDiv.appendChild(orderDiv);
+            });
+        }
+
+        // АДМІН: Зміна статусу замовлення
+        function updateStatus(id, newStatus) {
+            orders = orders.map(order => {
+                if(order.id === id) {
+                    order.status = newStatus;
+                }
+                return order;
+            });
+            localStorage.setItem('global_orders', JSON.stringify(orders));
+            renderAdminOrders();
+        }
+
+        // АДМІН: Очищення історії
+        function clearAllOrders() {
+            if(confirm("Точно видалити всі замовлення з історії?")) {
+                orders = [];
+                localStorage.setItem('global_orders', JSON.stringify(orders));
+                renderAdminOrders();
+            }
+        }
+    </script>
 </body>
 </html>
