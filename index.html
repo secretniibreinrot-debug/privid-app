@@ -5,175 +5,304 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ПРИВІД ПЛАТФОРМА</title>
     <style>
-        body { background: #0d1117; color: #c9d1d9; font-family: monospace; padding: 10px; text-align: center; margin: 0; }
-        .box { border: 2px solid #30363d; padding: 15px; border-radius: 10px; background: #161b22; max-width: 480px; margin: 10px auto; min-height: 85vh; display: flex; flex-direction: column; justify-content: space-between; }
-        h1 { color: #58a6ff; text-shadow: 0 0 5px rgba(88,166,255,0.3); font-size: 22px; margin: 5px 0; }
-        .nav-menu { display: flex; justify-content: space-around; background: #21262d; padding: 10px; border-radius: 5px; margin-bottom: 15px; border: 1px solid #30363d; }
-        .nav-item { color: #8b949e; cursor: pointer; font-weight: bold; font-size: 12px; text-transform: uppercase; }
-        .nav-item.active { color: #58a6ff; border-bottom: 2px solid #58a6ff; }
+        /* Темна тема за замовчуванням */
+        :root {
+            --bg-body: #0d1117;
+            --bg-box: #161b22;
+            --border-color: #30363d;
+            --text-color: #c9d1d9;
+            --accent-color: #58a6ff;
+            --card-bg: #21262d;
+        }
+        /* Світла тема */
+        .light-theme {
+            --bg-body: #f0f2f5;
+            --bg-box: #ffffff;
+            --border-color: #d0d7de;
+            --text-color: #24292f;
+            --accent-color: #0969da;
+            --card-bg: #f6f8fa;
+        }
+
+        body { background: var(--bg-body); color: var(--text-color); font-family: monospace; padding: 10px; text-align: center; margin: 0; transition: 0.3s; }
+        .box { border: 2px solid var(--border-color); padding: 15px; border-radius: 10px; background: var(--bg-box); max-width: 480px; margin: 10px auto; min-height: 92vh; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box; }
+        h1 { color: var(--accent-color); font-size: 22px; margin: 5px 0; }
+        .nav-menu { display: flex; justify-content: space-around; background: var(--card-bg); padding: 10px; border-radius: 5px; margin-bottom: 15px; border: 1px solid var(--border-color); }
+        .nav-item { color: #8b949e; cursor: pointer; font-weight: bold; font-size: 11px; text-transform: uppercase; }
+        .nav-item.active { color: var(--accent-color); border-bottom: 2px solid var(--accent-color); }
         .btn { background: #238636; color: white; border: none; padding: 10px 15px; font-size: 13px; border-radius: 5px; cursor: pointer; font-family: monospace; font-weight: bold; margin: 5px; width: 85%; }
         .btn:hover { background: #2ea043; }
         .btn-danger { background: #da3637; }
-        .btn-danger:hover { background: #f85149; }
-        .btn-nav { background: #30363d; color: #c9d1d9; width: auto; padding: 5px 10px; font-size: 11px; border: 1px solid #8b949e; }
-        input, select { background: #0d1117; color: #58a6ff; border: 1px solid #30363d; padding: 10px; border-radius: 5px; width: 80%; margin: 8px 0; font-family: monospace; text-align: center; }
+        .btn-secondary { background: var(--border-color); color: var(--text-color); width: auto; padding: 5px 10px; font-size: 11px; border: 1px solid #8b949e; }
+        input, select { background: var(--bg-body); color: var(--accent-color); border: 1px solid var(--border-color); padding: 10px; border-radius: 5px; width: 80%; margin: 8px 0; font-family: monospace; text-align: center; }
         .hidden { display: none !important; }
-        .screen { flex-grow: 1; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; }
-        .card { border: 1px solid #30363d; padding: 10px; margin: 8px 0; border-radius: 5px; background: #21262d; text-align: left; width: 85%; }
-        .game-area { width: 90%; height: 150px; background: #0d1117; border: 1px solid #30363d; position: relative; margin-top: 10px; overflow: hidden; border-radius: 5px; }
-        #clicker-circle { width: 70px; height: 70px; background: #da3637; border-radius: 50%; position: absolute; top: 40px; left: 110px; cursor: pointer; box-shadow: 0 0 10px #da3637; }
+        .screen { flex-grow: 1; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; width: 100%; }
+        .card { border: 1px solid var(--border-color); padding: 10px; margin: 8px 0; border-radius: 5px; background: var(--card-bg); text-align: left; width: 90%; box-sizing: border-box; }
+        
+        /* Таблиця ТОП */
+        .top-table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 12px; }
+        .top-table th, .top-table td { border: 1px solid var(--border-color); padding: 6px; text-align: center; }
+        .top-table th { background: var(--card-bg); }
+
+        /* Ігри */
+        .game-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 90%; margin-top: 10px; }
+        .game-card { background: var(--card-bg); border: 1px solid var(--border-color); padding: 15px; border-radius: 5px; cursor: pointer; font-weight: bold; color: var(--accent-color); font-size: 12px; }
+        .game-card:hover { background: var(--border-color); }
+        .game-container { width: 90%; height: 200px; background: #0d1117; border: 2px solid var(--border-color); position: relative; margin-top: 10px; overflow: hidden; border-radius: 5px; color: white; }
+        
+        #clicker-target { width: 40px; height: 40px; background: #da3637; border-radius: 50%; position: absolute; top: 80px; left: 100px; cursor: pointer; }
+        #flappy-bird { width: 20px; height: 20px; background: #f9c74f; position: absolute; left: 40px; top: 100px; border-radius: 3px; }
+        .pipe { width: 30px; background: #238636; position: absolute; right: -40px; }
+        .scroll-container { width: 100%; max-height: 250px; overflow-y: auto; }
     </style>
 </head>
 <body>
 
     <div class="box">
         <div id="login-screen" class="screen">
-            <h1>🕵️‍♂️ ВХІД В ПРИВІД</h1>
-            <p>Система вимагає авторизації захищеним паролем:</p>
-            <input type="password" id="login-password" placeholder="Введіть ваш пароль...">
-            <br>
+            <h1>🕵️‍♂️ СИСТЕМА ПРИВІД</h1>
+            <p style="font-size: 12px; color: #8b949e;">Вхід в захищений термінал</p>
+            <div class="card" style="text-align: center;">
+                <input type="text" id="login-username" placeholder="Вікно 1: Ваш Нікнейм...">
+                <input type="password" id="login-password" placeholder="Вікно 2: Ваш Пароль...">
+                <input type="text" id="login-code" placeholder="Вікно 3: Код доступу (опціонально)...">
+            </div>
             <button class="btn" onclick="login()">УВІЙТИ В АКАУНТ</button>
         </div>
 
         <div id="main-interface" class="screen hidden">
             <div style="width: 100%;">
                 <h1>ПРИВІД</h1>
-                <p style="font-size: 12px; color: #8b949e; margin: 2px 0;">Акаунт: <span id="lbl-nick" style="color:#79c0ff"></span> | Баланс: <span id="lbl-bal" style="color:#2ea043"></span> ₴</p>
+                <p style="font-size: 11px; color: #8b949e; margin: 2px 0;">Користувач: <span id="lbl-nick" style="color:#79c0ff"></span> | Баланс: <span id="lbl-bal" style="color:#2ea043"></span> ₴</p>
                 
                 <div class="nav-menu">
                     <div class="nav-item active" id="tab-home" onclick="switchTab('home')">Головна</div>
                     <div class="nav-item" id="tab-orders" onclick="switchTab('orders')">Замовлення</div>
                     <div class="nav-item" id="tab-games" onclick="switchTab('games')">Ігри</div>
-                    <div class="nav-item" id="tab-settings" onclick="switchTab('settings')">Налаштування</div>
+                    <div class="nav-item" id="tab-settings" onclick="switchTab('settings')">Опції</div>
                 </div>
             </div>
 
             <div id="view-home" class="screen-view" style="width: 100%;">
-                <h3>📊 ТОП ЗАМОВЛЕНЬ ПО МЕРЕЖІ</h3>
+                <h3>📊 РЕЙТИНГ МЕРЕЖІ ПО ЗАМОВЛЕННЯХ</h3>
                 <div class="card">
-                    <ol style="margin: 5px; padding-left: 20px; font-size: 13px;">
-                        <li>👑 Admin — 48 замовлень</li>
-                        <li>👻 Ghost-713 — 32 замовлення</li>
-                        <li>📱 User_Stealth — 19 замовлень</li>
-                    </ol>
+                    <table class="top-table">
+                        <tr><th>Місце</th><th>Нікнейм</th><th>Місії</th></tr>
+                        <tr><td>🥇 1</td><td>Ghost_KMR</td><td>142</td></tr>
+                        <tr><td>🥈 2</td><td>X_Phantom_X</td><td>98</td></tr>
+                        <tr><td>🥉 3</td><td>Stealth_B0ss</td><td>64</td></tr>
+                        <tr><td>⚡ 4</td><td>Cyber_Phantom</td><td>41</td></tr>
+                        <tr><td>⚡ 5</td><td>Dark_Anonym</td><td>19</td></tr>
+                    </table>
                 </div>
-                
-                <div id="client-request-ghost" class="card">
-                    <h4>🔒 Бажаєте стати Привидом?</h4>
-                    <p style="font-size: 11px; color: #8b949e;">Надішліть запит адміну. Після перевірки ви отримаєте доступ до виконання секретних місій.</p>
-                    <button class="btn btn-nav" onclick="sendGhostRequest()">Надіслати запит адміну</button>
+
+                <h3>📰 СТРІЧКА СЕРВЕРА (СКРОЛЛ)</h3>
+                <div class="scroll-container">
+                    <div class="card">📡 <b>Шлюз:</b> З'єднання безпечне. Логи шифруються кожні 60 секунд.</div>
+                    <div class="card">💡 <b>Інфо:</b> Ціни на розіграші знижено. Перевірте вкладку замовлень.</div>
+                    <div class="card">🎮 <b>Розваги:</b> Додано 6 нових міні-ігор для збиття часу в очікуванні місій!</div>
+                    <div class="card">🛡️ <b>Увага:</b> Не використовуйте однакові паролі на різних терміналах.</div>
                 </div>
             </div>
 
             <div id="view-orders" class="screen-view hidden" style="width: 100%;">
-                <h3>📦 СТВОРЕННЯ ЗАМОВЛЕННЯ</h3>
-                <p style="font-size:11px; color:#8b949e;">(Ціни встановлюються індивідуально адмінастратором)</p>
+                <h3>📦 ОФОРМЛЕННЯ ЗАМОВЛЕННЯ</h3>
                 <select id="order-select">
-                    <option value="Сбор данных">Сбор данных (Базова ціна: 500 ₴)</option>
-                    <option value="Пранк-доставка">Пранк-доставка (Базова ціна: 1500 ₴)</option>
-                    <option value="Спец-Місія">Спец-Місія (Базова ціна: 5000 ₴)</option>
+                    <option value="Збір даних">🕵️‍♂️ Збір інформації (15 ₴)</option>
+                    <option value="Пранк дзвінок">📞 Телефонний розіграш (30 ₴)</option>
+                    <option value="Спец-доставка">⚡ Швидкий кур'єр (50 ₴)</option>
+                    <option value="Супер Розіграш">💣 Повний Пранк-Пакет (100 ₴)</option>
                 </select>
-                <input type="text" id="order-desc" placeholder="Опишіть деталі та умову завдання...">
+                <input type="text" id="order-desc" placeholder="Вкажіть нік/телефон цілі та деталі...">
                 <button class="btn" onclick="makeOrder()">ВІДПРАВИТИ ЗАМОВЛЕННЯ</button>
             </div>
 
             <div id="view-games" class="screen-view hidden" style="width: 100%;">
-                <h3>🎯 ЗБИТИ ЧАС (МІНІ-ГРА)</h3>
-                <p>Встигни клікнути по цілі, що тікає! Рахунок: <b id="game-score">0</b></p>
-                <div class="game-area">
-                    <div id="clicker-circle" onclick="moveTarget()"></div>
+                <div id="games-main-menu" style="width:100%;">
+                    <h3>🎮 СПИСОК МІНІ-ІГОР</h3>
+                    <div class="game-grid">
+                        <div class="game-card" onclick="openGame('clicker')">🎯 Чорна Ціль</div>
+                        <div class="game-card" onclick="openGame('flappy')">🐦 Ноне-Пташка</div>
+                        <div class="game-card" onclick="openGame('rps')">✊ Камінь/Ніж</div>
+                        <div class="game-card" onclick="openGame('guess')">🔓 Злом Сейфу</div>
+                        <div class="game-card" onclick="openGame('clicker2')">💻 Хакер-Клік</div>
+                        <div class="game-card" onclick="openGame('coin')">🪙 Монетка</div>
+                    </div>
+                </div>
+
+                <div id="game-clicker" class="hidden">
+                    <button class="btn btn-secondary" onclick="exitGames()">↩️ Меню ігор</button>
+                    <p>Не тисни на чорне! Рахунок: <b id="score-c1">0</b></p>
+                    <div class="game-container" onclick="resetC1()" id="c1-field">
+                        <div id="clicker-target" onclick="hitC1(event)"></div>
+                    </div>
+                </div>
+
+                <div id="game-flappy" class="hidden">
+                    <button class="btn btn-secondary" onclick="exitGames()">↩️ Меню ігор</button>
+                    <p>Рахунок: <b id="score-f">0</b></p>
+                    <div class="game-container" style="height:160px;">
+                        <div id="flappy-bird"></div>
+                        <div class="pipe" id="p-top" style="height:40px; top:0;"></div>
+                        <div class="pipe" id="p-bottom" style="height:50px; bottom:0;"></div>
+                    </div>
+                    <button class="btn" onclick="fJump()">СТРИБОК</button>
+                </div>
+
+                <div id="game-rps" class="hidden">
+                    <button class="btn btn-secondary" onclick="exitGames()">↩️ Меню ігор</button>
+                    <h4>Камінь, Ножиці, Папір</h4>
+                    <button class="btn btn-secondary" onclick="playRPS('камінь')">✊ Камінь</button>
+                    <button class="btn btn-secondary" onclick="playRPS('ножиці')">✌️ Ножиці</button>
+                    <button class="btn btn-secondary" onclick="playRPS('папір')">✋ Папір</button>
+                    <p id="rps-res" style="color:#79c0ff; margin-top:10px;"></p>
+                </div>
+
+                <div id="game-guess" class="hidden">
+                    <button class="btn btn-secondary" onclick="exitGames()">↩️ Меню ігор</button>
+                    <h4>Вгадай код від 1 до 10</h4>
+                    <input type="number" id="guess-input" min="1" max="10" style="width:40%;">
+                    <button class="btn" onclick="playGuess()">Зламати</button>
+                    <p id="guess-res"></p>
+                </div>
+
+                <div id="game-clicker2" class="hidden">
+                    <button class="btn btn-secondary" onclick="exitGames()">↩️ Меню ігор</button>
+                    <h4>Майнінг монет кліками</h4>
+                    <p>Намайнено: <b id="score-c2">0</b></p>
+                    <button class="btn" style="height:60px; background:#1f6feb;" onclick="hitC2()">💻 КЛІК!</button>
+                </div>
+
+                <div id="game-coin" class="hidden">
+                    <button class="btn btn-secondary" onclick="exitGames()">↩️ Меню ігор</button>
+                    <h4>Орел чи Решка (Ставка 10 ₴)</h4>
+                    <button class="btn" onclick="playCoin('орел')">🦅 Орел</button>
+                    <button class="btn btn-danger" onclick="playCoin('решка')">🪙 Решка</button>
+                    <p id="coin-res"></p>
                 </div>
             </div>
 
             <div id="view-settings" class="screen-view hidden" style="width: 100%;">
-                <h3>⚙️ НАЛАШТУВАННЯ АКАУНТУ</h3>
+                <h3>⚙️ НАЛАШТУВАННЯ</h3>
                 <div class="card">
-                    <p><b>Ваш нікнейм:</b> <span id="set-nick"></span></p>
-                    <p><b>Поточний статус:</b> <span id="set-role" style="color:#8957e5; font-weight:bold;"></span></p>
+                    <p><b>Тема інтерфейсу:</b></p>
+                    <button class="btn btn-secondary" onclick="setTheme('dark')">🌑 Темна</button>
+                    <button class="btn btn-secondary" onclick="setTheme('light')">☀️ Світла</button>
                 </div>
                 <br>
-                <button class="btn btn-danger" onclick="logout()">🚨 ВИЙТИ З АКАУНТУ (WIPE SESSION)</button>
+                <button class="btn btn-danger" onclick="logout()">🚨 ВИЙТИ З АКАУНТУ</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Парсим параметры из ссылки Телеграма
         const urlParams = new URLSearchParams(window.location.search);
-        const userTelegramId = urlParams.get('id') || "test_user";
         const userRole = urlParams.get('role') || "client";
-        const userNick = urlParams.get('nick') || "Анонім";
-        const userBal = urlParams.get('bal') || "0";
+        const userNick = urlParams.get('nick') || "Гість";
+        const userBal = urlParams.get('bal') || "10500";
 
-        // Заполняем данные на экране
         document.getElementById('lbl-nick').innerText = userNick;
-        document.getElementById('set-nick').innerText = userNick;
         document.getElementById('lbl-bal').innerText = userBal;
-        document.getElementById('set-role').innerText = userRole.toUpperCase();
 
-        if(userRole === 'ghost' || userRole === 'admin') {
-            document.getElementById('client-request-ghost').classList.add('hidden');
-        }
-
-        // Логика авторизации
         function login() {
-            let pass = document.getElementById('login-password').value.trim();
-            if(!pass) return alert("Введіть пароль!");
+            let u = document.getElementById('login-username').value.trim();
+            let p = document.getElementById('login-password').value.trim();
+            if(!u || !p) return alert("Заповніть вікна Нікнейму та Паролю!");
             
-            // Запоминаем в сессии, что пароль введен
             sessionStorage.setItem('is_logged', 'true');
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('main-interface').classList.remove('hidden');
         }
 
-        // Проверка при открытии: если вылетал - требуем пароль
         if(sessionStorage.getItem('is_logged') === 'true') {
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('main-interface').classList.remove('hidden');
         }
 
-        function logout() {
-            sessionStorage.removeItem('is_logged');
-            alert("🔒 Сесію закрито. Дані акаунту скинуто!");
-            window.location.reload(); // выкидывает на окно ввода пароля
-        }
+        function logout() { sessionStorage.removeItem('is_logged'); window.location.reload(); }
 
-        // Переключение вкладок
         function switchTab(tabName) {
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.screen-view').forEach(el => el.classList.add('hidden'));
-            
             document.getElementById(`tab-${tabName}`).classList.add('active');
             document.getElementById(`view-${tabName}`).classList.remove('hidden');
+            exitGames();
         }
 
-        // Создание заказа
+        function setTheme(t) {
+            if(t === 'light') document.body.classList.add('light-theme');
+            else document.body.classList.remove('light-theme');
+        }
+
         function makeOrder() {
-            let type = document.getElementById('order-select').value;
-            let desc = document.getElementById('order-desc').value.trim();
-            if(!desc) return alert("Опишіть деталі пранку або місії!");
-            
-            alert(`🎯 Замовлення "${type}" надіслано адміну на перевірку ціни та балансу!`);
+            if(!document.getElementById('order-desc').value.trim()) return alert("Опишіть замовлення!");
+            alert("🎯 Замовлення відправлено! Очікуйте вердикт адміна.");
             document.getElementById('order-desc').value = "";
         }
 
-        function sendGhostRequest() {
-            alert("📨 Запит на статус 'Привид' успішно надіслано в ЛС адміну бота!");
+        // --- ДВИГУН ІГОР ---
+        function openGame(g) {
+            document.getElementById('games-main-menu').classList.add('hidden');
+            document.getElementById(`game-${g}`).classList.remove('hidden');
+            if(g === 'flappy') startF();
+        }
+        function exitGames() {
+            clearInterval(fLoop);
+            document.getElementById('games-main-menu').classList.remove('hidden');
+            document.querySelectorAll('[id^="game-"]').forEach(el => el.classList.add('hidden'));
         }
 
-        // Логика мини-игры
-        let score = 0;
-        function moveTarget() {
-            score++;
-            document.getElementById('game-score').innerText = score;
-            let circle = document.getElementById('clicker-circle');
-            
-            // Рандомно перемещаем кружок внутри блока
-            let randomX = Math.floor(Math.random() * 180);
-            let randomY = Math.floor(Math.random() * 80);
-            
-            circle.style.left = randomX + 'px';
-            circle.style.top = randomY + 'px';
+        // 1. Клікер Ціль
+        let c1Score = 0;
+        function hitC1(e) { e.stopPropagation(); c1Score++; document.getElementById('score-c1').innerText = c1Score; moveC1(); }
+        function resetC1() { c1Score = 0; document.getElementById('score-c1').innerText = 0; alert("💥 Промах! Рахунок скинуто."); moveC1(); }
+        function moveC1() { let t = document.getElementById('clicker-target'); t.style.left = Math.floor(Math.random()*200)+'px'; t.style.top = Math.floor(Math.random()*120)+'px'; }
+
+        // 2. Флаппі
+        let fTop = 60, fScore = 0, pLeft = 240, fLoop;
+        function startF() {
+            fTop = 60; fScore = 0; pLeft = 240;
+            clearInterval(fLoop);
+            fLoop = setInterval(() => {
+                fTop += 3; document.getElementById('flappy-bird').style.top = fTop+'px';
+                pLeft -= 5; if(pLeft < -30) { pLeft = 240; fScore++; document.getElementById('score-f').innerText = fScore; }
+                document.getElementById('p-top').style.left = pLeft+'px';
+                document.getElementById('p-bottom').style.left = pLeft+'px';
+                if(fTop > 140 || fTop < 0) { clearInterval(fLoop); alert("💀 Кінець гри!"); exitGames(); }
+            }, 50);
+        }
+        function fJump() { fTop -= 30; }
+
+        // 3. КНП
+        function playRPS(user) {
+            let choices = ['камінь', 'ножиці', 'папір'];
+            let bot = choices[Math.floor(Math.random()*3)];
+            let res = "";
+            if(user === bot) res = "Нічия!";
+            else if((user==='камінь'&&bot==='ножиці') || (user==='ножиці'&&bot==='папір') || (user==='папір'&&bot==='камінь')) res = "🎉 Ви виграли!";
+            else res = "💀 Ви програли!";
+            document.getElementById('rps-res').innerText = `Ви: ${user} | ПРИВІД: ${bot}. Результат: ${res}`;
+        }
+
+        // 4. Злом сейфу
+        function playGuess() {
+            let num = Math.floor(Math.random()*10)+1;
+            let val = parseInt(document.getElementById('guess-input').value);
+            let out = document.getElementById('guess-res');
+            if(val === num) out.innerHTML = "<b style='color:#2ea043'>🔓 Сейф зламано! Ви вгадали!</b>";
+            else out.innerHTML = `<b style='color:#da3637'>❌ Помилка. Код був: ${num}</b>`;
+        }
+
+        // 5. Хакер Клікер
+        let c2Score = 0;
+        function hitC2() { c2Score++; document.getElementById('score-c2').innerText = c2Score; }
+
+        // 6. Монетка
+        function playCoin(user) {
+            let side = Math.random() > 0.5 ? 'орел' : 'решка';
+            let out = document.getElementById('coin-res');
+            if(user === side) out.innerHTML = `<span style='color:#2ea043'>🎉 Випав ${side}. Ставка подвоєна!</span>`;
+            else out.innerHTML = `<span style='color:#da3637'>❌ Випав ${side}. Гроші згоріли.</span>`;
         }
     </script>
 </body>
