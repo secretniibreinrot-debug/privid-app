@@ -7,7 +7,11 @@
     <style>
         body { background: #0d1117; color: #58a6ff; font-family: monospace; padding: 20px; text-align: center; }
         .box { border: 2px dashed #238636; padding: 20px; border-radius: 10px; background: #161b22; max-width: 450px; margin: 0 auto; box-shadow: 0 0 15px rgba(35,134,54,0.3); }
-        h1 { color: #238636; text-shadow: 0 0 10px rgba(35,134,54,0.5); font-size: 20px; }
+        h1 { color: #238636; text-shadow: 0 0 10px rgba(35,134,54,0.5); font-size: 20px; margin-bottom: 5px; }
+        .role-badge { display: inline-block; padding: 3px 8px; border-radius: 3px; font-size: 12px; font-weight: bold; margin-bottom: 15px; }
+        .badge-client { background: #1f6feb; color: white; }
+        .badge-ghost { background: #8957e5; color: white; }
+        .badge-admin { background: #238636; color: white; }
         .btn { background: #238636; color: white; border: none; padding: 10px 20px; font-size: 14px; border-radius: 5px; cursor: pointer; font-family: monospace; font-weight: bold; margin: 5px; }
         .btn:hover { background: #2ea043; }
         .btn-danger { background: #da3637; }
@@ -24,24 +28,19 @@
 <body>
 
     <div class="box">
-        <div id="auth-screen">
-            <h1>🕵️‍♂️ ПРИВІД</h1>
-            <p>Для активації терміналу введіть секретний одноразовий код доступу:</p>
-            <input type="text" id="secret-code" placeholder="Код доступу (наприклад, PRV-1234)...">
-            <br>
-            <button class="btn" onclick="checkCode()">ПІДКЛЮЧИТИСЯ</button>
-            <p style="color: #8b949e; font-size: 11px; margin-top: 20px;">*Якщо у вас немає коду, зверніться до адміністратора в ЛС.</p>
-        </div>
+        <h1>🕵️‍♂️ ПРИВІД</h1>
+        
+        <div id="role-client-badge" class="role-badge badge-client">ТЕРМІНАЛ ЗАМОВНИКА</div>
+        <div id="role-ghost-badge" class="role-badge badge-ghost hidden">ТЕРМІНАЛ ПРИВИДА (ВИКОНАВЕЦЬ)</div>
+        <div id="role-admin-badge" class="role-badge badge-admin hidden">ГОЛОВНИЙ СЕРВЕР (АДМІНІСТРАТОР)</div>
 
-        <div id="client-screen" class="hidden">
-            <h1>📱 ТЕРМІНАЛ КОРИСТУВАЧА</h1>
-            <p>Статус з'єднання: <span class="status-active">ЗАШИФРОВАНО (ОДНОРАЗОВИЙ ВХІД)</span></p>
-            <p>Ваш баланс: <b id="client-balance">0</b> 🪙 (рандомні монетки)</p>
-            <button class="btn" onclick="farmCoins()">🎰 Випробувати вдачу (Фарм монет)</button>
-            
-            <hr style="border-color: #30363d;">
-            
-            <h3>📦 ОФОРМИТИ НОВЕ ЗАМОВЛЕННЯ</h3>
+        <p style="margin: 5px 0;">Ваш баланс: <b id="user-balance">10500</b> 🪙</p>
+        <button class="btn" style="padding: 5px 10px; font-size: 11px;" onclick="farmCoins()">🎰 Фарм монет (+рандом)</button>
+        
+        <hr style="border-color: #30363d;">
+
+        <div id="order-creation-block">
+            <h3>📦 ОФОРМИТИ ЗАМОВЛЕННЯ</h3>
             <select id="order-type">
                 <option value="🕵️‍♂️ Збір інформації">🕵️‍♂️ Збір інформації (100 монет)</option>
                 <option value="⚡ Швидка доставка">⚡ Швидка доставка (250 монет)</option>
@@ -52,175 +51,201 @@
             <button class="btn" onclick="createOrder()">ВІДПРАВИТИ ЗАМОВЛЕННЯ</button>
         </div>
 
-        <div id="admin-screen" class="hidden">
-            <h1>👑 ПАНЕЛЬ УПРАВЛІННЯ (АДМІН)</h1>
-            <p>Статус: <span class="status-active">ГОЛОВНИЙ СЕРВЕР ПРИВІД</span></p>
-            <p>Баланс системи: <span style="color:#2ea043; font-weight:bold;">9,999,999 ₴</span></p>
-            
+        <div id="ghost-block" class="hidden">
             <hr style="border-color: #30363d;">
-            
-            <h3>🔑 ГЕНЕРАТОР ОДНОРАЗОВИХ КОДІВ</h3>
-            <p>Згенеруйте код та віддайте його одному виконавцю:</p>
-            <button class="btn btn-secondary" onclick="generateOneTimeCode()">⚡ Згенерувати новий код</button>
+            <h3>👁️ СЕКРЕТНІ ЗАМОВЛЕННЯ ДЛЯ ПРИВИДІВ</h3>
+            <div id="ghost-orders-list">
+                <p style="color: #8b949e;">Доступних замовлень від клієнтів немає...</p>
+            </div>
+        </div>
+
+        <div id="admin-block" class="hidden">
+            <hr style="border-color: #30363d;">
+            <h3>🔑 ГЕНЕРАТОР КОДІВ ДЛЯ ПРИВИДІВ</h3>
+            <button class="btn btn-secondary" onclick="generateGhostCode()">⚡ Створити код для Привида</button>
             <br>
             <div id="generated-code-block" class="hidden">
                 <span class="code-display" id="display-code">PRV-0000</span>
-                <p style="color: #8b949e; font-size: 11px;">(Скопіюйте цей код та відправте в ЛС. Він згорить після першого входу!)</p>
+                <p style="color: #8b949e; font-size: 11px;">(Одноразовий код. Клієнт введе його внизу і стане Привидом)</p>
             </div>
             
             <h4>Активні коди в базі (<span id="codes-count">0</span>):</h4>
-            <div id="active-codes-list" style="color: #79c0ff; font-size: 12px; margin-bottom: 10px;">Немає активних кодів</div>
+            <div id="active-codes-list" style="color: #79c0ff; font-size: 12px; margin-bottom: 10px;">Немає</div>
 
-            <hr style="border-color: #30363d;">
-            
-            <h3>📥 НАДХОДЖЕННЯ ЗАМОВЛЕНЬ:</h3>
-            <div id="admin-orders-list">
-                <p style="color: #8b949e;">Нових замовлень поки немає...</p>
-            </div>
+            <h3>📥 ВСІ ЗАМОВЛЕННЯ В СИСТЕМІ:</h3>
+            <div id="admin-orders-list"></div>
             <br>
-            <button class="btn btn-danger" onclick="clearAllOrders()">Очистити всю історію замовлень</button>
+            <button class="btn btn-danger" onclick="clearAllOrders()">Очистити всю історію</button>
+        </div>
+
+        <div id="activation-block">
+            <hr style="border-color: #30363d; margin-top: 25px;">
+            <p style="font-size: 12px; color: #8b949e;">Маєте секретний код доступу?</p>
+            <input type="text" id="secret-code" placeholder="Введіть код сюди..." style="width: 60%; padding: 5px;">
+            <br>
+            <button class="btn btn-secondary" style="padding: 5px 15px; font-size: 12px;" onclick="checkCode()">Активувати</button>
         </div>
     </div>
 
     <script>
-        // Головний пароль адміна (завжди працює)
         const ADMIN_KEY = "ADMIN999";
 
         // Завантаження бази даних
-        let clientBalance = parseInt(localStorage.getItem('client_balance')) || 0;
+        let userBalance = parseInt(localStorage.getItem('prv_balance')) || 10500;
         let orders = JSON.parse(localStorage.getItem('global_orders')) || [];
-        let oneTimeCodes = JSON.parse(localStorage.getItem('one_time_codes')) || [];
+        let ghostCodes = JSON.parse(localStorage.getItem('ghost_codes')) || [];
+        let userRole = localStorage.getItem('user_role') || 'client'; // за замовчуванням всі - клієнти
 
-        document.getElementById('client-balance').innerText = clientBalance;
+        document.getElementById('user-balance').innerText = userBalance;
 
-        // Перевірка коду при вході
+        // Налаштування інтерфейсу під роль при старті
+        applyRoleInterface();
+
+        function applyRoleInterface() {
+            // Приховуємо все за замовчуванням
+            document.getElementById('role-client-badge').classList.add('hidden');
+            document.getElementById('role-ghost-badge').classList.add('hidden');
+            document.getElementById('role-admin-badge').classList.add('hidden');
+            document.getElementById('ghost-block').classList.add('hidden');
+            document.getElementById('admin-block').classList.add('hidden');
+            document.getElementById('activation-block').classList.remove('hidden');
+
+            if (userRole === 'admin') {
+                document.getElementById('role-admin-badge').classList.remove('hidden');
+                document.getElementById('admin-block').classList.remove('hidden');
+                document.getElementById('activation-block').classList.add('hidden');
+                renderAdminOrders();
+                renderActiveCodes();
+            } else if (userRole === 'ghost') {
+                document.getElementById('role-ghost-badge').classList.remove('hidden');
+                document.getElementById('ghost-block').classList.remove('hidden');
+                renderGhostOrders();
+            } else {
+                document.getElementById('role-client-badge').classList.remove('hidden');
+            }
+        }
+
+        // Перевірка введенного коду
         function checkCode() {
             let inputCode = document.getElementById('secret-code').value.trim();
             
-            // 1. Перевірка на адміна
             if (inputCode === ADMIN_KEY) {
-                document.getElementById('auth-screen').classList.add('hidden');
-                document.getElementById('admin-screen').classList.remove('hidden');
-                renderAdminOrders();
-                renderActiveCodes();
+                userRole = 'admin';
+                localStorage.setItem('user_role', 'admin');
+                applyRoleInterface();
+                alert("👑 Вітаємо, Босс! Головний сервер активовано.");
+                document.getElementById('secret-code').value = "";
                 return;
             }
-            
-            // 2. Перевірка на одноразовий клієнтський код
-            if (oneTimeCodes.includes(inputCode)) {
-                // Видаляємо код із бази, бо він ОДНОРАЗОВИЙ
-                oneTimeCodes = oneTimeCodes.filter(c => c !== inputCode);
-                localStorage.setItem('one_time_codes', JSON.stringify(oneTimeCodes));
+
+            if (ghostCodes.includes(inputCode)) {
+                // Видаляємо одноразовий код із бази
+                ghostCodes = ghostCodes.filter(c => c !== inputCode);
+                localStorage.setItem('ghost_codes', JSON.stringify(ghostCodes));
                 
-                // Пропускаємо в термінал
-                document.getElementById('auth-screen').classList.add('hidden');
-                document.getElementById('client-screen').classList.remove('hidden');
-                alert("✅ Доступ дозволено! Цей код успішно активовано та анульовано в базі.");
+                userRole = 'ghost';
+                localStorage.setItem('user_role', 'ghost');
+                applyRoleInterface();
+                alert("👻 Код активовано! Ви стали ПРИВИДОМ. Вам доступні секретні замовлення!");
+                document.getElementById('secret-code').value = "";
             } else {
-                alert("❌ ПОМИЛКА: Невірний, застарілий або вже використаний код доступу.");
+                alert("❌ Код не знайдено, або він вже був використаний іншим Привидом.");
             }
         }
 
-        // АДМІН: Генерація нового одноразового коду
-        function generateOneTimeCode() {
-            let randomNum = Math.floor(1000 + Math.random() * 9000); // 4-значне число
-            let newCode = `PRV-${randomNum}`;
-            
-            oneTimeCodes.push(newCode);
-            localStorage.setItem('one_time_codes', JSON.stringify(oneTimeCodes));
-            
+        // АДМІН: Створення одноразового коду для Привида
+        function generateGhostCode() {
+            let randomNum = Math.floor(1000 + Math.random() * 9000);
+            let newCode = `GHOST-${randomNum}`;
+            ghostCodes.push(newCode);
+            localStorage.setItem('ghost_codes', JSON.stringify(ghostCodes));
             document.getElementById('display-code').innerText = newCode;
             document.getElementById('generated-code-block').classList.remove('hidden');
-            
             renderActiveCodes();
         }
 
-        // АДМІН: Показ списку робочих кодів
         function renderActiveCodes() {
-            document.getElementById('codes-count').innerText = oneTimeCodes.length;
+            document.getElementById('codes-count').innerText = ghostCodes.length;
             let listDiv = document.getElementById('active-codes-list');
-            if(oneTimeCodes.length === 0) {
-                listDiv.innerText = "Немає активних кодів";
-            } else {
-                listDiv.innerText = oneTimeCodes.join(', ');
-            }
+            listDiv.innerText = ghostCodes.length === 0 ? "Немає" : ghostCodes.join(', ');
         }
 
-        // КЛІЄНТ: Фарм монеток
+        // Фарм монет
         function farmCoins() {
-            let randomWin = Math.floor(Math.random() * 50) + 10;
-            clientBalance += randomWin;
-            localStorage.setItem('client_balance', clientBalance);
-            document.getElementById('client-balance').innerText = clientBalance;
-            alert(`🎰 Ви виграли ${randomWin} рандомних монеток!`);
+            let win = Math.floor(Math.random() * 150) + 20;
+            userBalance += win;
+            localStorage.setItem('prv_balance', userBalance);
+            document.getElementById('user-balance').innerText = userBalance;
         }
 
-        // КЛІЄНТ: Створення замовлення
+        // КЛІЄНТ / ПРИВИД: Створення замовлення
         function createOrder() {
             let type = document.getElementById('order-type').value;
             let comment = document.getElementById('order-comment').value.trim();
-            
-            if(!comment) {
-                alert("Будь ласка, напишіть деталі замовлення!");
-                return;
-            }
+            if(!comment) return alert("Опишіть деталі замовлення!");
 
             let newOrder = {
                 id: Date.now(),
                 type: type,
                 comment: comment,
-                status: '⚡ Очікує на перевірку'
+                author: userRole === 'ghost' ? '👻 Привид' : '📱 Замовник',
+                status: '⚡ Очікує перевірки'
             };
 
             orders.push(newOrder);
             localStorage.setItem('global_orders', JSON.stringify(orders));
             document.getElementById('order-comment').value = "";
-            alert("🎯 Замовлення успішно відправлено адміністратору!");
+            alert("🎯 Замовлення надіслано в систему ПРИВІД!");
+            if(userRole === 'ghost') renderGhostOrders();
         }
 
-        // АДМІН: Відображення замовлень
+        // ПРИВИД: Перегляд замовлень
+        function renderGhostOrders() {
+            let listDiv = document.getElementById('ghost-orders-list');
+            listDiv.innerHTML = "";
+            if(orders.length === 0) {
+                listDiv.innerHTML = '<p style="color: #8b949e;">Доступних замовлень немає...</p>';
+                return;
+            }
+            orders.forEach(order => {
+                let div = document.createElement('div');
+                div.className = 'card';
+                div.innerHTML = `<b>Тип:</b> ${order.type}<br><b>Деталі:</b> ${order.comment}<br><b>Статус:</b> <span style="color:#79c0ff">${order.status}</span>`;
+                listDiv.appendChild(div);
+            });
+        }
+
+        // АДМІН: Відображення замовлень з кнопками
         function renderAdminOrders() {
             let listDiv = document.getElementById('admin-orders-list');
             listDiv.innerHTML = "";
-
             if(orders.length === 0) {
-                listDiv.innerHTML = '<p style="color: #8b949e;">Нових замовлень поки немає...</p>';
+                listDiv.innerHTML = '<p style="color: #8b949e;">Замовлень немає</p>';
                 return;
             }
-
             orders.forEach(order => {
-                let orderDiv = document.createElement('div');
-                orderDiv.className = 'card';
-                orderDiv.innerHTML = `
+                let div = document.createElement('div');
+                div.className = 'card';
+                div.innerHTML = `
+                    <b>Від кого:</b> ${order.author}<br>
                     <b>Тип:</b> ${order.type}<br>
                     <b>Деталі:</b> ${order.comment}<br>
-                    <b>Статус:</b> <span>${order.status}</span><br><br>
-                    <button class="btn" style="padding:5px 10px; font-size:11px;" onclick="updateStatus(${order.id}, '✅ ПРИЙНЯТО')">Приняти</button>
+                    <b>Статус:</b> <b>${order.status}</b><br><br>
+                    <button class="btn" style="padding:5px 10px; font-size:11px;" onclick="updateStatus(${order.id}, '✅ ПРИЙНЯТО')">Прийняти</button>
                     <button class="btn btn-danger" style="padding:5px 10px; font-size:11px;" onclick="updateStatus(${order.id}, '❌ ВІДХИЛЕНО')">Відхилити</button>
                 `;
-                listDiv.appendChild(orderDiv);
+                listDiv.appendChild(div);
             });
         }
 
-        // АДМІН: Зміна статусу замовлення
         function updateStatus(id, newStatus) {
-            orders = orders.map(order => {
-                if(order.id === id) {
-                    order.status = newStatus;
-                }
-                return order;
-            });
+            orders = orders.map(o => { if(o.id === id) o.status = newStatus; return o; });
             localStorage.setItem('global_orders', JSON.stringify(orders));
             renderAdminOrders();
         }
 
-        // АДМІН: Очищення історії
         function clearAllOrders() {
-            if(confirm("Точно видалити всі замовлення з історії?")) {
-                orders = [];
-                localStorage.setItem('global_orders', JSON.stringify(orders));
-                renderAdminOrders();
-            }
+            if(confirm("Очистити все?")) { orders = []; localStorage.setItem('global_orders', JSON.stringify(orders)); renderAdminOrders(); }
         }
     </script>
 </body>
