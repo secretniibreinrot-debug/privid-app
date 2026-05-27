@@ -1,8 +1,8 @@
 import telebot
 from telebot import types
 
-# Твій токен
-bot = telebot.TeleBot("8803136202:AAGQkKSMzLcExYMHUl-fpQ1GWNzQudo2VU8")
+# СЮДИ ВСТАВ ТОЙ ТОКЕН, ЯКИЙ СКОПІЮВАВ У BOTFATHER ХВИЛИНУ ТОМУ!
+bot = telebot.TeleBot("8803136202:AAGwMqAOggIk-KpeY1xMhDKitQ8bvtMlRgY")
 
 @bot.message_handler(commands=['start'])
 def start_command(message):
